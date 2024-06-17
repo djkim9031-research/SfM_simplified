@@ -15,7 +15,7 @@
 // @param t2                3x1 translation vector of view2.
 // @param pts2D_1           Matched pixels of view1.
 // @param pts2D_2           Matched pixels of view2.
-
+//
 // @param pts3D_H           Triangulated 3D points in homogeneous coordinate.
 void linearTriangulation(const Eigen::Matrix3d &K, 
                          const Eigen::Matrix3d &R1,
