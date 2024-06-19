@@ -32,15 +32,15 @@ void linearPnP(const Eigen::Matrix3d &K,
     Eigen::MatrixXd pts2D_H = makeHomogeneous(pts2D);
     Eigen::MatrixXd pts3D_H = makeHomogeneous(pts3D);
 
-    //x = KR[I | -B]X
-    //(normalize img coord) K^-1*x = R[I | -B]X
+    //x = KR[I | -t]X
+    //(normalize img coord) K^-1*x = R[I | -t]X
     Eigen::MatrixXd xn = ((K.inverse())*(pts2D_H.transpose())).transpose(); // num_pts, 3
     Eigen::MatrixXd A(3*n, 12);
     for(int i=0; i<n; ++i){
         double u = xn(i, 0);
         double v = xn(i, 1);
 
-        //cross product of xn and PX = 0, since same direction vector where P = R[I|-B]
+        //cross product of xn and PX = 0, since same direction vector where P = R[I|-t]
         //Using skew symmetric matrix of xn, skew(xn)*PX = 0
         //Rearranging to make Aw = 0 form for vectors of P = [P1, P2, P3].T 3 rows of (1x4) vectors, 
         //A = skew(xn)*[X 0 0, 0 X 0, 0 0 X]
@@ -143,11 +143,11 @@ struct PnPLoss{
     }
 
     template<typename T>
-    void projectionMatrix(const Eigen::Matrix<T, 3, 3> &R, const Eigen::Matrix<T, 3, 1> &B, 
+    void projectionMatrix(const Eigen::Matrix<T, 3, 3> &R, const Eigen::Matrix<T, 3, 1> &t, 
                           const Eigen::Matrix<T, 3, 3> &K, Eigen::Matrix<T, 3, 4> &P){
         
         Eigen::Matrix<T, 3, 4> trans;
-        trans << Eigen::Matrix<T, 3, 3>::Identity(), -B;
+        trans << Eigen::Matrix<T, 3, 3>::Identity(), -t;
         P = K * (R * trans);        
     }
 
@@ -175,9 +175,9 @@ struct PnPLoss{
         return true;
     }
     
-    static ceres::CostFunction* create(const Eigen::MatrixXd &pts, const Eigen::MatrixXd &x3D, const Eigen::Matrix3d &K){
+    static ceres::CostFunction* create(const Eigen::MatrixXd &pts2D, const Eigen::MatrixXd &pts3D, const Eigen::Matrix3d &K){
         return new ceres::AutoDiffCostFunction<PnPLoss, ceres::DYNAMIC, 7>(
-            new PnPLoss(pts, x3D, K), pts.rows()*2);
+            new PnPLoss(pts2D, pts3D, K), pts2D.rows()*2);
     }
 
     Eigen::MatrixXd pts2D_, pts3D_;

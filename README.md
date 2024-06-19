@@ -10,3 +10,18 @@ Given a set of 6 images with fisheye lens distortion corrected, and SIFT keypoin
 6. Nonlinear optimization using Ceres solver to minimize the reprojection error.
 6. Step 4 and 6 are repeated until all image pairs are covered.
 
+
+## Prerequisites
+
+Ensure you have the following software installed on your system:
+
+- Docker
+- CMake
+- A C++ compiler (This repo has been tested with `g++` version 9.4.0)
+
+## Getting Started
+
+### Building the Docker Container
+
+
+
